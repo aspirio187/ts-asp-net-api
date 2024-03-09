@@ -1,0 +1,23 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug with Nodemon",
+      "runtimeExecutable": "${workspaceFolder}\\node_modules\\.bin\\nodemon.cmd",
+      "program": "${workspaceFolder}/src/index.ts",
+      "restart": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**"],
+      "runtimeArgs": ["--inspect", "-r", "ts-node/register"],
+      "env": {
+        "TS_NODE_PROJECT": "tsconfig.json"
+      }
+    }
+  ]
+}
