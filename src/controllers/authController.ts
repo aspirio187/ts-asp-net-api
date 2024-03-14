@@ -1,4 +1,14 @@
 import { Request, Response, response } from "express";
+import { ControllerBase } from "./ControllerBase";
+import { addMethod } from "../index";
+import {
+  HttpResult,
+  badRequest,
+  notFound,
+  ok,
+} from "../webSupport/HttpMethods";
+import { httpGet, httpPost } from "../decorators/HttpMethodDecorators";
+import { DIContainer } from "../DIContainer";
 
 export type LoginForm = {
   email: string;
@@ -13,61 +23,67 @@ export type LoginResult = {
   };
 };
 
-export function notFound<T>(data: T) {
-  return {
-    statusCode: 404,
-    data,
-  };
-}
-
-export function badRequest<T>(data: T) {
-  return {
-    statusCode: 400,
-    data,
-  };
-}
-
-export class AuthController {
-  private request: Request | null | undefined;
-
+export class AuthController extends ControllerBase {
   /**
    *
    */
-  constructor() {
-    this.request = null;
-  }
-
-  set Request(req: Request) {
-    this.request = req;
+  constructor(transientService: any) {
+    super();
   }
 
   @httpPost("/login")
-  public login(loginForm: LoginForm) {
-    if (!loginForm) {
-      return notFound("");
+  public login(body: LoginForm): HttpResult<LoginResult> {
+    if (!body) {
+      return notFound({
+        token: "",
+        user: {
+          id: "",
+          email: "",
+        },
+      });
     }
 
-    if (loginForm.email === "" || loginForm.password === "") {
-      return badRequest("");
+    if (body.email === "" || body.password === "") {
+      return badRequest({
+        token: "",
+        user: {
+          id: "",
+          email: "",
+        },
+      });
     }
+
+    return ok({
+      token: "123456",
+      user: {
+        id: "123",
+        email: "test",
+      },
+    });
   }
-}
 
-function httpPost(endpoint: string) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
-    const originalMethod = descriptor.value;
-    descriptor.value = function (req: Request, res: Response) {
-      const result = originalMethod.call(this, req.body);
-      if (result.statusCode === 404) {
-        return res.status(404).send(result.data);
-      }
-      if (result.statusCode === 400) {
-        return res.status(400).send(result.data);
-      }
-    };
-  };
+  @httpPost("/user/:id")
+  public createUser(body: LoginForm, id: string): HttpResult<unknown> {
+    if (!body) {
+      return badRequest();
+    }
+
+    if (!id) {
+      return badRequest();
+    }
+
+    if (body.email === "" || body.password === "") {
+      return badRequest();
+    }
+
+    return ok();
+  }
+
+  @httpGet("/user/:id")
+  public getUser(id: string): HttpResult<unknown> {
+    return ok({
+      id,
+      email: "test",
+    });
+  }
 }
